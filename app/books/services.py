@@ -71,8 +71,13 @@ def list_books(
     else:  # newest
         query = query.order_by(Book.created_at.desc())
 
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-    return pagination.items, pagination.total, pagination.pages
+    try:
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        return pagination.items, pagination.total, pagination.pages
+    except Exception as e:
+        logger.error(f"Error querying book listings: {e}")
+        db.session.rollback()
+        return [], 0, 1
 
 
 def get_book_by_id(book_id: int, include_hidden: bool = False) -> Optional[Book]:
