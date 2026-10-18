@@ -15,6 +15,8 @@ def normalize_database_url(url: str | None) -> str:
     Fixes legacy 'postgres://' URLs provided by Heroku/Render/Vercel/Neon.
     """
     if not url:
+        if os.environ.get('VERCEL'):
+            return "sqlite:////tmp/pallotti_bookloop.db"
         return f"sqlite:///{BASE_DIR / 'pallotti_bookloop.db'}"
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql+psycopg://", 1)
