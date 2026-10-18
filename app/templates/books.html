@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb & Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 fw-bold text-primary-navy mb-1">Academic Marketplace</h1>
+            <p class="text-muted mb-0">Discover and request textbooks listed by SVPCET students</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('books.add_book') }}" class="btn btn-teal">
+                <i class="bi bi-plus-lg me-1"></i> List a Book
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters & Search Form -->
+    <div class="filter-card mb-4">
+        <form action="{{ url_for('books.marketplace') }}" method="GET" class="row g-3 align-items-end">
+            <!-- Search -->
+            <div class="col-lg-3 col-md-6">
+                <label for="search" class="form-label small fw-bold text-muted">Keyword Search</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="search" name="search" class="form-control border-start-0" placeholder="Title, author, ISBN..." value="{{ search }}">
+                </div>
+            </div>
+
+            <!-- Category -->
+            <div class="col-lg-2 col-md-4 col-6">
+                <label for="category" class="form-label small fw-bold text-muted">Academic Stream</label>
+                <select name="category" id="category" class="form-select">
+                    <option value="All" {% if selected_category == 'All' %}selected{% endif %}>All Streams</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Semester -->
+            <div class="col-lg-2 col-md-4 col-6">
+                <label for="semester" class="form-label small fw-bold text-muted">Semester</label>
+                <select name="semester" id="semester" class="form-select">
+                    <option value="All" {% if selected_semester == 'All' %}selected{% endif %}>All Semesters</option>
+                    {% for sem in semesters %}
+                        <option value="{{ sem }}" {% if selected_semester == sem %}selected{% endif %}>{{ sem }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Condition -->
+            <div class="col-lg-2 col-md-4 col-6">
+                <label for="condition" class="form-label small fw-bold text-muted">Condition</label>
+                <select name="condition" id="condition" class="form-select">
+                    <option value="All" {% if selected_condition == 'All' %}selected{% endif %}>All Conditions</option>
+                    {% for cond in conditions %}
+                        <option value="{{ cond }}" {% if selected_condition == cond %}selected{% endif %}>{{ cond }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div class="col-lg-2 col-md-4 col-6">
+                <label for="status" class="form-label small fw-bold text-muted">Availability</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="All" {% if selected_status == 'All' %}selected{% endif %}>All Statuses</option>
+                    {% for st in statuses %}
+                        <option value="{{ st }}" {% if selected_status == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort -->
+            <div class="col-lg-2 col-md-4 col-6">
+                <label for="sort_by" class="form-label small fw-bold text-muted">Sort By</label>
+                <select name="sort_by" id="sort_by" class="form-select">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="title" {% if selected_sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                </select>
+            </div>
+
+            <!-- Submit & Reset -->
+            <div class="col-lg-1 col-md-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100" title="Apply Filters">
+                    <i class="bi bi-funnel"></i>
+                </button>
+                {% if search or selected_category != 'All' or selected_semester != 'All' or selected_condition != 'All' or selected_status != 'All' or selected_sort != 'newest' %}
+                <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-secondary" title="Clear Filters">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-3 text-muted small">
+        <div>
+            Showing <strong class="text-dark">{{ books|length }}</strong> of <strong class="text-dark">{{ total }}</strong> book listings
+        </div>
+        {% if search %}
+        <div>
+            Filtered by: <span class="badge bg-light text-dark border">"{{ search }}"</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Books Grid -->
+    {% if books %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% for book in books %}
+        <div class="col">
+            <div class="book-card">
+                <div class="book-cover-container">
+                    {% if book.cover_image_url %}
+                        <img src="{{ book.cover_image_url }}" alt="{{ book.title }}" class="book-cover-img" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'book-cover-placeholder\'><i class=\'bi bi-journal-text fs-1 text-primary\'></i><div class=\'small text-muted mt-1\'>{{ book.category }}</div></div>';">
+                    {% else %}
+                        <div class="book-cover-placeholder">
+                            <i class="bi bi-journal-text fs-1 text-primary"></i>
+                            <div class="small text-muted mt-1">{{ book.category }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="position-absolute top-0 start-0 m-2">
+                        <span class="badge badge-status-{{ book.exchange_status.replace(' ', '-') }}">
+                            {{ book.exchange_status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="book-card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-1">
+                        <div>
+                            <span class="badge-category">{{ book.category }}</span>
+                            {% if book.semester %}
+                            <span class="badge bg-light text-primary border ms-1">{{ book.semester }}</span>
+                            {% endif %}
+                        </div>
+                        <span class="badge badge-condition-{{ book.condition.replace(' ', '-') }}">{{ book.condition }}</span>
+                    </div>
+
+                    <h5 class="book-title" title="{{ book.title }}">{{ book.title }}</h5>
+                    <p class="book-author"><i class="bi bi-pen me-1"></i>{{ book.author }}</p>
+
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div class="small text-muted text-truncate me-2" style="max-width: 150px;">
+                            <i class="bi bi-person me-1"></i>{{ book.owner_name }}
+                        </div>
+                        <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-outline-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pages > 1 %}
+    <nav aria-label="Book pagination" class="my-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('books.marketplace', page=page-1, search=search, category=selected_category, semester=selected_semester, condition=selected_condition, status=selected_status, sort_by=selected_sort) }}">
+                    <i class="bi bi-chevron-left"></i> Previous
+                </a>
+            </li>
+            {% for p in range(1, pages + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('books.marketplace', page=p, search=search, category=selected_category, semester=selected_semester, condition=selected_condition, status=selected_status, sort_by=selected_sort) }}">
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if page >= pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('books.marketplace', page=page+1, search=search, category=selected_category, semester=selected_semester, condition=selected_condition, status=selected_status, sort_by=selected_sort) }}">
+                    Next <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-5 bg-white rounded-3 border my-4">
+        <div class="mb-3 text-muted">
+            <i class="bi bi-search fs-1"></i>
+        </div>
+        <h4 class="fw-bold text-primary-navy">No books found matching your criteria</h4>
+        <p class="text-muted max-w-500 mx-auto">
+            Try adjusting your search terms, removing filters, or be the first student to list this textbook for your batchmates.
+        </p>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-secondary">Clear All Filters</a>
+            <a href="{{ url_for('books.add_book') }}" class="btn btn-teal">List a Book Now</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="text-center mb-4">
+                    <span class="brand-icon-wrap mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </span>
+                    <h2 class="fw-bold text-primary-navy">Join Pallotti BookLoop</h2>
+                    <p class="text-muted small">Create your student account to share and request textbooks</p>
+                </div>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label small fw-bold text-muted">Full Name <span class="text-danger">*</span></label>
+                        {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else ""), placeholder="e.g. Yash Sharma", id="full_name") }}
+                        {% for error in form.full_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="college_email" class="form-label small fw-bold text-muted">College / Student Email <span class="text-danger">*</span></label>
+                        {{ form.college_email(class="form-control" + (" is-invalid" if form.college_email.errors else ""), placeholder="name@stvincentngp.edu.in", id="college_email") }}
+                        {% for error in form.college_email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Department -->
+                        <div class="col-md-6">
+                            <label for="department" class="form-label small fw-bold text-muted">Department <span class="text-danger">*</span></label>
+                            {{ form.department(class="form-select" + (" is-invalid" if form.department.errors else ""), id="department") }}
+                            {% for error in form.department.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Academic Year -->
+                        <div class="col-md-6">
+                            <label for="academic_year" class="form-label small fw-bold text-muted">Academic Year <span class="text-danger">*</span></label>
+                            {{ form.academic_year(class="form-select" + (" is-invalid" if form.academic_year.errors else ""), id="academic_year") }}
+                            {% for error in form.academic_year.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label small fw-bold text-muted">Contact / WhatsApp Number (Optional)</label>
+                        {{ form.phone_number(class="form-control" + (" is-invalid" if form.phone_number.errors else ""), placeholder="+91 98765 43210", id="phone_number") }}
+                        <div class="form-text small">Used only to coordinate physical textbook handovers on campus.</div>
+                        {% for error in form.phone_number.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <label for="password" class="form-label small fw-bold text-muted">Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Min 6 characters", id="password") }}
+                                <button class="btn btn-light border toggle-password-btn" type="button" data-target="password" aria-label="Toggle password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label small fw-bold text-muted">Confirm Password <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), placeholder="Re-type password", id="confirm_password") }}
+                                <button class="btn btn-light border toggle-password-btn" type="button" data-target="confirm_password" aria-label="Toggle confirm password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% for error in form.confirm_password.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-teal py-2">
+                            <i class="bi bi-person-check me-1"></i> Create Student Account
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted">
+                        Already have an account?
+                        <a href="{{ url_for('auth.login') }}" class="text-teal fw-bold">Sign In here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Student Header Card -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+            <div class="stat-icon stat-icon-navy rounded-circle mx-auto mx-md-0" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="text-center text-md-start">
+                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                    <h2 class="fw-bold text-primary-navy mb-0">{{ student.full_name }}</h2>
+                    {% if student.is_verified %}
+                        <span class="badge bg-success-subtle text-success border border-success" title="Verified College Email">
+                            <i class="bi bi-patch-check-fill me-1"></i> Verified Student
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="text-muted mb-2">
+                    <i class="bi bi-mortarboard me-1"></i> {{ student.department }} &bull; {{ student.academic_year }}
+                </div>
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 small text-muted">
+                    <span><i class="bi bi-calendar3 me-1"></i> Member since {{ student.created_at.strftime('%b %Y') }}</span>
+                    <span><i class="bi bi-arrow-left-right me-1 text-teal"></i> <strong>{{ student.successful_exchanges_count }}</strong> completed exchanges</span>
+                    {% if student.average_rating %}
+                        <span><i class="bi bi-star-fill text-warning me-1"></i> <strong>{{ student.average_rating }}</strong> / 5.0 peer rating</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Listings by Student -->
+    <h4 class="fw-bold text-primary-navy mb-3">Active Listings by {{ student.full_name.split()[0] }} ({{ books|length }})</h4>
+
+    {% if books %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        {% for book in books %}
+        <div class="col">
+            <div class="book-card">
+                <div class="book-cover-container">
+                    {% if book.cover_image_url %}
+                        <img src="{{ book.cover_image_url }}" alt="{{ book.title }}" class="book-cover-img" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'book-cover-placeholder\'><i class=\'bi bi-journal-text fs-1 text-primary\'></i><div class=\'small text-muted mt-1\'>{{ book.category }}</div></div>';">
+                    {% else %}
+                        <div class="book-cover-placeholder">
+                            <i class="bi bi-journal-text fs-1 text-primary"></i>
+                            <div class="small text-muted mt-1">{{ book.category }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="position-absolute top-0 start-0 m-2">
+                        <span class="badge badge-status-{{ book.exchange_status.replace(' ', '-') }}">
+                            {{ book.exchange_status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="book-card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge-category">{{ book.category }}</span>
+                        <span class="badge badge-condition-{{ book.condition.replace(' ', '-') }}">{{ book.condition }}</span>
+                    </div>
+
+                    <h5 class="book-title" title="{{ book.title }}">{{ book.title }}</h5>
+                    <p class="book-author"><i class="bi bi-pen me-1"></i>{{ book.author }}</p>
+
+                    <div class="mt-auto pt-3 border-top text-end">
+                        <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-outline-primary btn-sm">
+                            View Listing
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white rounded-4 border">
+        <i class="bi bi-book fs-1 text-muted mb-2 d-block"></i>
+        <h6 class="text-muted">This student currently has no active textbook listings.</h6>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

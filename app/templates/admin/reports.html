@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary-navy mb-0">Listing Reports</h1>
+            <p class="text-muted small mb-0">Student reports submitted for inappropriate or sold book listings</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.reports', status='Pending') }}" class="btn btn-sm {% if selected_status == 'Pending' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Pending</a>
+            <a href="{{ url_for('admin.reports', status='Reviewed') }}" class="btn btn-sm {% if selected_status == 'Reviewed' %}btn-success{% else %}btn-outline-secondary{% endif %}">Reviewed</a>
+            <a href="{{ url_for('admin.reports', status='Dismissed') }}" class="btn btn-sm {% if selected_status == 'Dismissed' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Dismissed</a>
+            <a href="{{ url_for('admin.reports', status='All') }}" class="btn btn-sm {% if selected_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        {% if reports %}
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th>Reported Book</th>
+                        <th>Reporter</th>
+                        <th>Reason</th>
+                        <th>Note</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reports %}
+                    <tr>
+                        <td>
+                            {% if r.book %}
+                                <a href="{{ url_for('books.book_detail', book_id=r.book_id) }}" class="fw-bold text-primary-navy text-decoration-none">
+                                    {{ r.book.title }}
+                                </a>
+                                {% if r.book.is_hidden %}
+                                    <span class="badge bg-danger ms-1">Hidden</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">Deleted Book</span>
+                            {% endif %}
+                        </td>
+                        <td class="small">{{ r.reporter.full_name if r.reporter else 'N/A' }}</td>
+                        <td><span class="badge bg-warning-subtle text-warning border border-warning">{{ r.reason }}</span></td>
+                        <td class="small text-muted text-truncate" style="max-width: 200px;">{{ r.note or 'No notes' }}</td>
+                        <td>
+                            <span class="badge {% if r.status == 'Pending' %}bg-warning text-dark{% elif r.status == 'Reviewed' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                        <td class="small text-muted">{{ r.created_at.strftime('%d %b %Y') }}</td>
+                        <td class="text-end">
+                            {% if r.status == 'Pending' %}
+                            <div class="btn-group btn-group-sm">
+                                <form action="{{ url_for('admin.hide_reported_book', report_id=r.id) }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Hide Listing">
+                                        <i class="bi bi-eye-slash me-1"></i> Hide Book
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('admin.dismiss_report', report_id=r.id) }}" method="POST" class="d-inline ms-1">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Dismiss Report">
+                                        <i class="bi bi-x-circle me-1"></i> Dismiss
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="small text-muted">Handled</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-check-circle display-4 text-success mb-2 d-block"></i>
+            No reports found for status '{{ selected_status }}'.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

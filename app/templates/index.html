@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <span class="badge bg-teal-subtle text-white border border-info mb-3 px-3 py-2 rounded-pill small">
+                    <i class="bi bi-mortarboard-fill me-1"></i> St. Vincent Pallotti College of Engg. & Tech.
+                </span>
+                <h1 class="hero-title mb-3">Find Your Next Semester's Books.</h1>
+                <p class="hero-lead mb-4">
+                    Pallotti BookLoop is the student-to-student textbook exchange. List books you've already completed, discover engineering books from seniors, and share knowledge across campus.
+                </p>
+
+                <!-- Search Form -->
+                <form action="{{ url_for('books.marketplace') }}" method="GET" class="hero-search-box mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 text-muted">
+                            <i class="bi bi-search fs-5"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control border-0 shadow-none" placeholder="Search by title, author, course, or ISBN (e.g., Cormen, Grewal)..." aria-label="Search books">
+                        <button class="btn btn-teal px-4" type="submit">
+                            Find Books
+                        </button>
+                    </div>
+                </form>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('books.marketplace') }}" class="btn btn-light fw-bold text-primary-navy px-4 py-2">
+                        <i class="bi bi-grid-3x3-gap-fill me-1"></i> Browse Marketplace
+                    </a>
+                    <a href="{{ url_for('books.add_book') }}" class="btn btn-outline-light px-4 py-2">
+                        <i class="bi bi-plus-lg me-1"></i> List a Book
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <div class="p-4 rounded-4 shadow-lg" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                    <div class="display-1 text-info mb-3">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                    <h4 class="text-white fw-bold mb-2">Reuse. Save. Excel.</h4>
+                    <p class="text-light-50 small mb-4">
+                        Every semester, hundreds of engineering textbooks sit idle on student shelves. BookLoop connects you with batchmates who need them right now.
+                    </p>
+                    <div class="d-flex justify-content-around text-start border-top border-light-subtle pt-3">
+                        <div>
+                            <div class="fs-4 fw-bold text-white">100%</div>
+                            <div class="small text-light-50">Free to Exchange</div>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-white">Campus</div>
+                            <div class="small text-light-50">Direct Handover</div>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold text-white">All Years</div>
+                            <div class="small text-light-50">1st to 4th Year</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recently Listed Books -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-primary-navy mb-1">Recently Listed Textbooks</h2>
+                <p class="text-muted mb-0">Latest additions shared by SVPCET students across all departments</p>
+            </div>
+            <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-custom btn-sm">
+                View All Listings <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        {% if recent_books %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for book in recent_books %}
+            <div class="col">
+                <div class="book-card h-100">
+                    <div class="book-cover-container">
+                        {% if book.cover_image_url %}
+                            <img src="{{ book.cover_image_url }}" alt="{{ book.title }}" class="book-cover-img" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'book-cover-placeholder\'><i class=\'bi bi-book fs-1\'></i><br><small class=\'text-muted\'>No Cover Preview</small></div>';">
+                        {% else %}
+                            <div class="book-cover-placeholder">
+                                <i class="bi bi-journal-text fs-1 text-primary"></i>
+                                <div class="small text-muted mt-1">{{ book.category }}</div>
+                            </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 start-0 m-2">
+                            <span class="badge badge-status-{{ book.exchange_status.replace(' ', '-') }}">
+                                {{ book.exchange_status }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="book-card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge-category">{{ book.category }}</span>
+                            <span class="badge badge-condition-{{ book.condition.replace(' ', '-') }}">{{ book.condition }}</span>
+                        </div>
+                        <h5 class="book-title" title="{{ book.title }}">{{ book.title }}</h5>
+                        <p class="book-author"><i class="bi bi-pen me-1"></i>{{ book.author }}</p>
+                        
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div class="small text-muted text-truncate me-2" style="max-width: 150px;">
+                                <i class="bi bi-person me-1"></i>{{ book.owner_name }}
+                            </div>
+                            <a href="{{ url_for('books.book_detail', book_id=book.id) }}" class="btn btn-outline-primary btn-sm">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 bg-white rounded-3 border">
+            <i class="bi bi-book fs-1 text-muted mb-3 d-block"></i>
+            <h5>No books listed yet</h5>
+            <p class="text-muted">Be the first student to list a book in the marketplace!</p>
+            <a href="{{ url_for('books.add_book') }}" class="btn btn-teal">List a Book Now</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill mb-2">Simple 3-Step Process</span>
+            <h2 class="fw-bold text-primary-navy">How Pallotti BookLoop Works</h2>
+            <p class="text-muted">Designed specifically for the St. Vincent Pallotti campus community.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 h-100 border bg-light-subtle">
+                    <div class="stat-icon stat-icon-navy mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-upload fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">1. List Your Academic Books</h5>
+                    <p class="text-muted small mb-0">
+                        Enter title, author, and condition. Use our instant ISBN lookup tool to fetch details automatically in seconds.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 h-100 border bg-light-subtle">
+                    <div class="stat-icon stat-icon-teal mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-search fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">2. Discover & Request</h5>
+                    <p class="text-muted small mb-0">
+                        Filter by engineering department, year, or subject. Request an exchange and optionally offer one of your own books.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 rounded-3 h-100 border bg-light-subtle">
+                    <div class="stat-icon stat-icon-green mx-auto mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-arrow-left-right fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">3. Meet on Campus & Exchange</h5>
+                    <p class="text-muted small mb-0">
+                        Once accepted, the book is reserved. Connect via student contact, meet in the library or department, and mark completed!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="badge bg-teal text-white px-3 py-1 rounded-pill mb-2">Why Exchange Books?</span>
+                <h2 class="fw-bold text-primary-navy mb-4">Empowering SVPCET Students</h2>
+                
+                <div class="d-flex gap-3 mb-4">
+                    <div class="stat-icon stat-icon-navy flex-shrink-0">
+                        <i class="bi bi-currency-rupee"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Make Education More Affordable</h6>
+                        <p class="text-muted small mb-0">
+                            Save thousands of rupees each academic year by borrowing or exchanging semester textbooks rather than purchasing brand new copies.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mb-4">
+                    <div class="stat-icon stat-icon-teal flex-shrink-0">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Promote Reuse & Sustainability</h6>
+                        <p class="text-muted small mb-0">
+                            Give textbooks a circular lifespan. A single textbook can pass through multiple batches of engineering students across years.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <div class="stat-icon stat-icon-amber flex-shrink-0">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Senior-Junior Academic Mentorship</h6>
+                        <p class="text-muted small mb-0">
+                            Book exchanges naturally create touchpoints between senior and junior students for sharing notes, syllabus tips, and course advice.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 text-center">
+                <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4 bg-white">
+                    <div class="mb-3">
+                        <span class="badge rounded-pill bg-teal text-white p-3 fs-3">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </span>
+                    </div>
+                    <h3 class="fw-bold text-primary-navy mb-3">Ready to share or find a textbook?</h3>
+                    <p class="text-muted mb-4">
+                        Join your college peers on Pallotti BookLoop today. Registration is free and takes less than a minute.
+                    </p>
+                    <div class="d-grid gap-2 col-md-8 mx-auto">
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-teal py-2">Create Student Account</a>
+                        <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-custom py-2">Explore Available Books</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

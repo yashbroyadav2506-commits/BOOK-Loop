@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="py-5">
+        <div class="display-1 fw-bold text-primary-navy mb-3">404</div>
+        <h2 class="fw-bold text-primary-navy mb-3">Page or Listing Not Found</h2>
+        <p class="text-muted max-w-500 mx-auto mb-4">
+            The book listing or page you are looking for may have been removed, exchanged, or the URL might be mistyped.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('books.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-house-door me-1"></i> Home
+            </a>
+            <a href="{{ url_for('books.marketplace') }}" class="btn btn-teal">
+                <i class="bi bi-grid me-1"></i> Explore Marketplace
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

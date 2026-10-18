@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary-navy mb-0">My Notifications</h1>
+            <p class="text-muted small mb-0">Updates on your book requests, exchanges, and wishlist matches</p>
+        </div>
+        {% if notifications %}
+        <form action="{{ url_for('dashboard.mark_all_notifications_read') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-check2-all me-1"></i> Mark All as Read
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        {% if notifications %}
+        <div class="list-group list-group-flush">
+            {% for n in notifications %}
+            <div class="list-group-item px-0 py-3 {% if not n.is_read %}bg-light-subtle rounded px-3 mb-2{% endif %}">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <h6 class="fw-bold text-primary-navy mb-0">
+                        {% if not n.is_read %}<span class="badge bg-teal p-1 me-1">New</span>{% endif %}
+                        {{ n.title }}
+                    </h6>
+                    <span class="small text-muted">{{ n.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                </div>
+                <p class="text-secondary small mb-2">{{ n.message }}</p>
+                {% if n.link %}
+                <a href="{{ url_for('dashboard.mark_notification_read', notif_id=n.id) }}" class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size: 0.8rem;">
+                    View Details <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-bell-slash display-4 mb-2 d-block"></i>
+            <h5>You have no notifications</h5>
+            <p class="small">When other students request your textbooks or respond to your exchanges, updates will show up here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

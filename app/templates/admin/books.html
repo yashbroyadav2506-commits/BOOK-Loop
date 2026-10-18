@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary-navy mb-0">Book Listings Moderation</h1>
+            <p class="text-muted small mb-0">View all listed books, hide inappropriate listings, or unhide resolved items</p>
+        </div>
+        <form action="{{ url_for('admin.books') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by title, author, owner..." value="{{ search }}">
+            <button class="btn btn-outline-custom btn-sm" type="submit">Search</button>
+            {% if search %}
+            <a href="{{ url_for('admin.books') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        {% if books %}
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th>Title & Author</th>
+                        <th>Category</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th>Visibility</th>
+                        <th>Listed Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in books %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-primary-navy">
+                                <a href="{{ url_for('books.book_detail', book_id=b.id) }}" class="text-decoration-none text-primary-navy">
+                                    {{ b.title }}
+                                </a>
+                            </div>
+                            <div class="small text-muted">{{ b.author }}</div>
+                        </td>
+                        <td><span class="badge badge-category">{{ b.category }}</span></td>
+                        <td class="small">{{ b.owner_name }}</td>
+                        <td>
+                            <span class="badge badge-status-{{ b.exchange_status.replace(' ', '-') }}">
+                                {{ b.exchange_status }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if b.is_hidden %}
+                                <span class="badge bg-danger"><i class="bi bi-eye-slash-fill me-1"></i>Hidden</span>
+                            {% else %}
+                                <span class="badge bg-success-subtle text-success"><i class="bi bi-eye-fill me-1"></i>Visible</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">{{ b.created_at.strftime('%d %b %Y') }}</td>
+                        <td class="text-end">
+                            <form action="{{ url_for('admin.toggle_book_hidden', book_id=b.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm {% if b.is_hidden %}btn-outline-success{% else %}btn-outline-danger{% endif %}">
+                                    {% if b.is_hidden %}Unhide{% else %}Hide Listing{% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            No books found matching "{{ search }}".
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

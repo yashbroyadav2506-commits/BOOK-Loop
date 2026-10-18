@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/v1/cron/expire-stale-books",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "env": {
+    "FLASK_ENV": "production"
+  }
+}

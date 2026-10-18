@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <h1 class="fw-bold text-primary-navy mb-3">Privacy Policy</h1>
+            <p class="text-muted small mb-4">Last Updated: October 2026 &bull; Plain-Language Draft for Community Review</p>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white text-secondary leading-relaxed">
+                <div class="alert alert-info py-2 small mb-4">
+                    <i class="bi bi-shield-check me-1"></i> <strong>Privacy-First Commitment:</strong> We never sell your personal data or share private student contact details publicly.
+                </div>
+
+                <h5 class="fw-bold text-primary-navy">1. Information We Collect</h5>
+                <p>
+                    When you create an account on Pallotti BookLoop, we collect your name, college email, department, academic year, and optional phone/WhatsApp number. We also record textbook listings and exchange history.
+                </p>
+
+                <h5 class="fw-bold text-primary-navy mt-4">2. Privacy-Conscious Contact Sharing</h5>
+                <p>
+                    Your email address and phone number are <strong>never</strong> displayed publicly on book listings or in search results. Contact information is only shared between two students after an exchange request has been officially <strong>Accepted</strong> by the book owner.
+                </p>
+
+                <h5 class="fw-bold text-primary-navy mt-4">3. Passwords & Security</h5>
+                <p>
+                    Passwords are encrypted using industry-standard Werkzeug salted hashes. We never store plaintext passwords. Sessions utilize secure, HttpOnly cookies with CSRF tokens protecting all state-changing interactions.
+                </p>
+
+                <h5 class="fw-bold text-primary-navy mt-4">4. External Storage & APIs</h5>
+                <p>
+                    Book cover images may be stored on external secure cloud storage providers (such as Cloudinary). ISBN queries connect anonymously to the Open Library public API without transmitting student identity information.
+                </p>
+
+                <h5 class="fw-bold text-primary-navy mt-4">5. Account Deletion</h5>
+                <p>
+                    Students can request account deactivation or removal of their listings at any time by contacting support or through an administrator.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

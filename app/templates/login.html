@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="text-center mb-4">
+                    <span class="brand-icon-wrap mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+                    <h2 class="fw-bold text-primary-navy">Student Sign In</h2>
+                    <p class="text-muted small">Access your BookLoop account and exchange requests</p>
+                </div>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="college_email" class="form-label small fw-bold text-muted">College Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-envelope"></i></span>
+                            {{ form.college_email(class="form-control border-start-0" + (" is-invalid" if form.college_email.errors else ""), placeholder="student@stvincentngp.edu.in", id="college_email") }}
+                        </div>
+                        {% for error in form.college_email.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label small fw-bold text-muted">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-lock"></i></span>
+                            {{ form.password(class="form-control border-start-0 border-end-0" + (" is-invalid" if form.password.errors else ""), placeholder="Enter your password", id="password") }}
+                            <button class="btn btn-light border border-start-0 toggle-password-btn" type="button" data-target="password" aria-label="Toggle password visibility">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Remember me -->
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            {{ form.remember_me(class="form-check-input", id="remember_me") }}
+                            <label class="form-check-label small text-muted" for="remember_me">Keep me signed in</label>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-teal py-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to BookLoop
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted">
+                        Don't have an account yet?
+                        <a href="{{ url_for('auth.register') }}" class="text-teal fw-bold">Register here</a>
+                    </div>
+                </form>
+
+                <!-- Demo accounts hint -->
+                <div class="mt-4 pt-3 border-top bg-light-subtle rounded-3 p-3 text-center">
+                    <div class="small fw-bold text-primary-navy mb-1"><i class="bi bi-info-circle me-1"></i>Demo Accounts for Reviewers</div>
+                    <div class="small text-muted font-monospace">aarav.cse@stvincentngp.edu.in</div>
+                    <div class="small text-muted font-monospace">priya.aids@stvincentngp.edu.in</div>
+                    <div class="small text-muted mt-1">Default Password: <code>Student@123</code></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

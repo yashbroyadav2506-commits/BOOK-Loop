@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge bg-teal-subtle text-teal px-3 py-1 rounded-pill mb-2">Got Questions?</span>
+        <h1 class="fw-bold text-primary-navy">Frequently Asked Questions</h1>
+        <p class="text-muted">Common questions about textbook exchanges, account trust, and campus handovers.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion accordion-flush card border-0 shadow-sm rounded-4 p-4 bg-white" id="faqAccordion">
+                
+                <div class="accordion-item border-bottom">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fw-bold text-primary-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Is Pallotti BookLoop completely free to use?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary small">
+                            Yes! Pallotti BookLoop is 100% free for students of St. Vincent Pallotti College of Engineering & Technology. There are no fees for listing books, sending exchange requests, or using the platform.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-bottom">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed fw-bold text-primary-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Why do I need to verify my email address?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary small">
+                            Email verification guarantees that every student listing books or submitting requests is a legitimate member of the college community. This protects students against spam, fake listings, and abandoned requests.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-bottom">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed fw-bold text-primary-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Is my phone number or WhatsApp visible to everyone?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary small">
+                            No. Your contact information is kept strictly private. It is only unlocked and displayed to your exchange partner <strong>after</strong> an exchange request is officially accepted, ensuring privacy and eliminating unsolicited calls.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-bottom">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed fw-bold text-primary-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Where do students meet to exchange books?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary small">
+                            All exchanges happen directly on campus. Common designated meeting spots include the Central Library entrance, Tech Park lobby, the Admin block foyer, and the campus cafeteria.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed fw-bold text-primary-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            What if someone lists an inappropriate book or incorrect edition?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary small">
+                            Every book listing has a <strong>"Report Listing"</strong> button. Student moderators and campus admins review reports and can immediately remove or hide problematic listings.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

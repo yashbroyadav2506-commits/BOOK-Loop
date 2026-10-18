@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Add Wishlist Form -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="stat-icon stat-icon-teal" style="width: 40px; height: 40px;">
+                        <i class="bi bi-bell-fill fs-5"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold text-primary-navy mb-0">Add to Wishlist</h5>
+                        <p class="text-muted small mb-0">Get notified when a peer lists this book</p>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('books.wishlist') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label small fw-bold text-muted">Book Title or Subject <span class="text-danger">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Database System Concepts" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label small fw-bold text-muted">ISBN (Optional)</label>
+                        <input type="text" id="isbn" name="isbn" class="form-control" placeholder="10 or 13 digits">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label small fw-bold text-muted">Academic Stream</label>
+                        <select id="category" name="category" class="form-select">
+                            <option value="">Any Stream</option>
+                            {% for c in categories %}
+                                <option value="{{ c }}">{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-teal">
+                            <i class="bi bi-bookmark-plus me-1"></i> Save to Wishlist
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Wishlist Items List -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <h5 class="fw-bold text-primary-navy mb-3">My Saved Textbook Alerts</h5>
+
+                {% if wishlist %}
+                <div class="list-group list-group-flush">
+                    {% for w in wishlist %}
+                    <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-primary-navy">{{ w.title }}</div>
+                            <div class="small text-muted">
+                                {% if w.category %}<span class="badge badge-category me-1">{{ w.category }}</span>{% endif %}
+                                {% if w.isbn %}<span class="text-secondary font-monospace">ISBN: {{ w.isbn }} &bull;</span>{% endif %}
+                                Saved on {{ w.created_at.strftime('%d %b %Y') }}
+                            </div>
+                            <div class="small mt-1">
+                                {% if w.is_notified %}
+                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle me-1"></i>Notification Sent</span>
+                                {% else %}
+                                    <span class="badge bg-info-subtle text-primary"><i class="bi bi-radar me-1"></i>Listening for listings</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <form action="{{ url_for('books.delete_wishlist_item', item_id=w.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove Alert">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-bookmark-heart display-4 mb-2 d-block"></i>
+                    <h6>No books on your wishlist yet</h6>
+                    <p class="small">Add textbooks you will need next semester to receive instant notifications when batchmates list them.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

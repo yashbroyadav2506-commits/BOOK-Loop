@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-primary-navy mb-1">Student Dashboard</h1>
+            <p class="text-muted mb-0">Manage your textbook listings, track exchange requests, and coordinate peer trades</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('books.add_book') }}" class="btn btn-teal">
+                <i class="bi bi-plus-lg me-1"></i> List New Textbook
+            </a>
+            <a href="{{ url_for('books.wishlist') }}" class="btn btn-outline-custom">
+                <i class="bi bi-bookmark-heart me-1"></i> My Wishlist
+            </a>
+        </div>
+    </div>
+
+    <!-- Stat Cards Grid -->
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
+        <div class="col">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-navy">
+                    <i class="bi bi-journal-album"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ summary.total_books }}</div>
+                    <div class="stat-label">My Books Listed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-teal">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ summary.available_books }}</div>
+                    <div class="stat-label">Available for Trade</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ summary.pending_incoming }}</div>
+                    <div class="stat-label">Incoming Requests</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <i class="bi bi-send-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ summary.pending_outgoing }}</div>
+                    <div class="stat-label">Outgoing Requests</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i class="bi bi-arrow-left-right"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ summary.accepted_exchanges + summary.completed_exchanges }}</div>
+                    <div class="stat-label">Total Exchanges</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-5">
+        <div class="card-header bg-white border-bottom p-0">
+            <ul class="nav nav-tabs border-0 px-3 pt-2" id="dashboardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-3 px-4 fw-semibold {% if active_tab in ['summary', 'books'] %}active{% endif %}" id="books-tab" data-bs-toggle="tab" data-bs-target="#books-content" type="button" role="tab" aria-controls="books-content" aria-selected="true">
+                        <i class="bi bi-journal-bookmark me-2"></i>My Listed Books ({{ my_books|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-3 px-4 fw-semibold {% if active_tab == 'incoming' %}active{% endif %}" id="incoming-tab" data-bs-toggle="tab" data-bs-target="#incoming-content" type="button" role="tab" aria-controls="incoming-content" aria-selected="false">
+                        <i class="bi bi-inbox me-2"></i>Incoming Requests
+                        {% if summary.pending_incoming > 0 %}
+                            <span class="badge rounded-pill bg-warning text-dark ms-1">{{ summary.pending_incoming }}</span>
+                        {% endif %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-3 px-4 fw-semibold {% if active_tab == 'outgoing' %}active{% endif %}" id="outgoing-tab" data-bs-toggle="tab" data-bs-target="#outgoing-content" type="button" role="tab" aria-controls="outgoing-content" aria-selected="false">
+                        <i class="bi bi-send me-2"></i>Outgoing Requests
+                        {% if summary.pending_outgoing > 0 %}
+                            <span class="badge rounded-pill bg-info text-dark ms-1">{{ summary.pending_outgoing }}</span>
+                        {% endif %}
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="tab-content" id="dashboardTabsContent">
+                <!-- Tab 1: My Books -->
+                <div class="tab-pane fade {% if active_tab in ['summary', 'books'] %}show active{% endif %}" id="books-content" role="tabpanel" aria-labelledby="books-tab">
+                    {% if my_books %}
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover">
+                            <thead class="table-light text-muted small">
+                                <tr>
+                                    <th>Book Title & Details</th>
+                                    <th>Category</th>
+                                    <th>Condition</th>
+                                    <th>Exchange Status</th>
+                                    <th>Listed Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for b in my_books %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded overflow-hidden bg-light border flex-shrink-0" style="width: 44px; height: 56px;">
+                                                {% if b.cover_image_url %}
+                                                    <img src="{{ b.cover_image_url }}" alt="{{ b.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="h-100 d-flex align-items-center justify-content-center text-muted small"><i class="bi bi-book"></i></div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <a href="{{ url_for('books.book_detail', book_id=b.id) }}" class="fw-bold text-primary-navy text-decoration-none">
+                                                    {{ b.title }}
+                                                </a>
+                                                <div class="small text-muted">{{ b.author }}</div>
+                                                {% if b.is_hidden %}
+                                                    <span class="badge bg-danger small">Hidden by Moderator</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-category">{{ b.category }}</span></td>
+                                    <td><span class="badge badge-condition-{{ b.condition.replace(' ', '-') }}">{{ b.condition }}</span></td>
+                                    <td>
+                                        <span class="badge badge-status-{{ b.exchange_status.replace(' ', '-') }}">
+                                            {{ b.exchange_status }}
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">{{ b.created_at.strftime('%d %b %Y') }}</td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('books.book_detail', book_id=b.id) }}" class="btn btn-outline-secondary" title="View Listing">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('books.edit_book', book_id=b.id) }}" class="btn btn-outline-primary" title="Edit Listing">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            {% if b.exchange_status not in ['Reserved', 'Exchanged'] %}
+                                            <form action="{{ url_for('books.delete_book', book_id=b.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this book listing?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-outline-danger" title="Delete Listing">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-journal-plus display-4 text-muted mb-3 d-block"></i>
+                        <h5>You haven't listed any textbooks yet</h5>
+                        <p class="text-muted small">Share used engineering textbooks with other students at SVPCET.</p>
+                        <a href="{{ url_for('books.add_book') }}" class="btn btn-teal btn-sm">List a Book Now</a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tab 2: Incoming Requests -->
+                <div class="tab-pane fade {% if active_tab == 'incoming' %}show active{% endif %}" id="incoming-content" role="tabpanel" aria-labelledby="incoming-tab">
+                    {% if incoming_requests %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for req in incoming_requests %}
+                        <div class="card border rounded-3 p-3 bg-light-subtle">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge badge-status-{{ req.status.replace(' ', '-') }}">{{ req.status }}</span>
+                                        <span class="small text-muted">&bull; Submitted on {{ req.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-primary-navy">
+                                        Request for "{{ req.book.title }}"
+                                    </h6>
+                                    <div class="small text-muted mb-2">
+                                        <strong>From:</strong> 
+                                        <a href="{{ url_for('books.student_profile', user_id=req.requester_id) }}" class="text-primary-navy fw-semibold text-decoration-none">
+                                            {{ req.requester.full_name }}
+                                        </a>
+                                        ({{ req.requester.department }}, {{ req.requester.academic_year }})
+                                        
+                                        <!-- Privacy-conscious contact details (Phase C.3) -->
+                                        {% if req.status in [RequestStatus.ACCEPTED, RequestStatus.COMPLETED] %}
+                                            <div class="mt-2 p-2 bg-success-subtle rounded border border-success-subtle small text-success">
+                                                <i class="bi bi-unlock-fill me-1"></i> <strong>Contact Student:</strong>
+                                                {% if req.requester.phone_number %}
+                                                    Phone/WhatsApp: <a href="tel:{{ req.requester.phone_number }}" class="text-success fw-bold">{{ req.requester.phone_number }}</a> &bull;
+                                                {% endif %}
+                                                Email: {{ req.requester.college_email }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if req.message %}
+                                    <div class="p-2 bg-white rounded border small text-secondary mb-2">
+                                        <i class="bi bi-chat-quote me-1"></i>"{{ req.message }}"
+                                    </div>
+                                    {% endif %}
+
+                                    {% if req.offered_book %}
+                                    <div class="small text-muted">
+                                        <i class="bi bi-arrow-left-right text-teal me-1"></i> Offered book in return: <strong>{{ req.offered_book.title }}</strong> ({{ req.offered_book.condition }})
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Action buttons -->
+                                <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                                    {% if req.status == RequestStatus.PENDING %}
+                                        <form action="{{ url_for('exchanges.accept', request_id=req.id) }}" method="POST">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-teal btn-sm">
+                                                <i class="bi bi-check-lg me-1"></i> Accept Request
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('exchanges.reject', request_id=req.id) }}" method="POST" onsubmit="return confirm('Decline this exchange request?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-x-lg me-1"></i> Reject
+                                            </button>
+                                        </form>
+                                    {% elif req.status == RequestStatus.ACCEPTED %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-success-subtle text-success p-2 small">
+                                                <i class="bi bi-bookmark-check me-1"></i> Reserved on Campus
+                                            </span>
+                                            <form action="{{ url_for('exchanges.complete', request_id=req.id) }}" method="POST" onsubmit="return confirm('Confirm that the physical book handover is complete?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-check2-all me-1"></i> Mark Handover Complete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% elif req.status == RequestStatus.COMPLETED and not req.rating %}
+                                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rateModal{{ req.id }}">
+                                            <i class="bi bi-star me-1"></i> Rate Student
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rating Modal -->
+                        {% if req.status == RequestStatus.COMPLETED and not req.rating %}
+                        <div class="modal fade" id="rateModal{{ req.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <form action="{{ url_for('exchanges.rate_partner', request_id=req.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="modal-header border-bottom">
+                                            <h5 class="modal-title fw-bold text-primary-navy">Rate Exchange Partner</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <p class="small text-muted mb-3">How was your exchange experience with <strong>{{ req.requester.full_name }}</strong>?</p>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-muted">Rating (1 to 5 Stars)</label>
+                                                <select name="rating" class="form-select" required>
+                                                    <option value="5">⭐⭐⭐⭐⭐ 5 Stars - Excellent & on time</option>
+                                                    <option value="4">⭐⭐⭐⭐ 4 Stars - Very Good</option>
+                                                    <option value="3">⭐⭐⭐ 3 Stars - Average</option>
+                                                    <option value="2">⭐⭐ 2 Stars - Below expectations</option>
+                                                    <option value="1">⭐ 1 Star - Poor experience</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-muted">Feedback / Comments (Optional)</label>
+                                                <textarea name="comment" class="form-control" rows="2" placeholder="Friendly, book in exact promised condition..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-top bg-light-subtle">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-teal btn-sm">Submit Rating</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-4 text-muted mb-3 d-block"></i>
+                        <h5>No incoming exchange requests</h5>
+                        <p class="text-muted small">When other students request your textbooks, they will appear here.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tab 3: Outgoing Requests -->
+                <div class="tab-pane fade {% if active_tab == 'outgoing' %}show active{% endif %}" id="outgoing-content" role="tabpanel" aria-labelledby="outgoing-tab">
+                    {% if outgoing_requests %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for req in outgoing_requests %}
+                        <div class="card border rounded-3 p-3 bg-light-subtle">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge badge-status-{{ req.status.replace(' ', '-') }}">{{ req.status }}</span>
+                                        <span class="small text-muted">&bull; Requested on {{ req.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                                    </div>
+                                    <h6 class="fw-bold mb-1 text-primary-navy">
+                                        <a href="{{ url_for('books.book_detail', book_id=req.book_id) }}" class="text-decoration-none text-primary-navy">
+                                            "{{ req.book.title }}"
+                                        </a>
+                                    </h6>
+                                    <div class="small text-muted mb-2">
+                                        <strong>Owner:</strong> 
+                                        <a href="{{ url_for('books.student_profile', user_id=req.owner_id) }}" class="text-primary-navy fw-semibold text-decoration-none">
+                                            {{ req.owner.full_name }}
+                                        </a>
+                                        ({{ req.owner.department }})
+                                        
+                                        <!-- Privacy-conscious contact details (Phase C.3) -->
+                                        {% if req.status in [RequestStatus.ACCEPTED, RequestStatus.COMPLETED] %}
+                                            <div class="mt-2 p-2 bg-success-subtle rounded border border-success-subtle small text-success">
+                                                <i class="bi bi-unlock-fill me-1"></i> <strong>Contact Owner:</strong>
+                                                {% if req.owner.phone_number %}
+                                                    Phone/WhatsApp: <a href="tel:{{ req.owner.phone_number }}" class="text-success fw-bold">{{ req.owner.phone_number }}</a> &bull;
+                                                {% endif %}
+                                                Email: {{ req.owner.college_email }} &bull;
+                                                Meeting Spot: <strong>{{ req.owner.preferred_meeting_spot or 'Central Library Entrance' }}</strong>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if req.message %}
+                                    <div class="p-2 bg-white rounded border small text-secondary mb-2">
+                                        <i class="bi bi-chat-quote me-1"></i>Your message: "{{ req.message }}"
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+                                    {% if req.status == RequestStatus.PENDING %}
+                                        <form action="{{ url_for('exchanges.cancel', request_id=req.id) }}" method="POST" onsubmit="return confirm('Cancel this exchange request?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                                <i class="bi bi-x-circle me-1"></i> Cancel Request
+                                            </button>
+                                        </form>
+                                    {% elif req.status == RequestStatus.ACCEPTED %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-success-subtle text-success p-2 small">
+                                                <i class="bi bi-bookmark-check me-1"></i> Accepted by Owner
+                                            </span>
+                                            <form action="{{ url_for('exchanges.complete', request_id=req.id) }}" method="POST" onsubmit="return confirm('Confirm that you have received the book and completed the handover?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-check2-all me-1"></i> Mark Received / Complete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% elif req.status == RequestStatus.COMPLETED and not req.rating %}
+                                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rateOwnerModal{{ req.id }}">
+                                            <i class="bi bi-star me-1"></i> Rate Student
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rating Modal for Owner -->
+                        {% if req.status == RequestStatus.COMPLETED and not req.rating %}
+                        <div class="modal fade" id="rateOwnerModal{{ req.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <form action="{{ url_for('exchanges.rate_partner', request_id=req.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="modal-header border-bottom">
+                                            <h5 class="modal-title fw-bold text-primary-navy">Rate Book Owner</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <p class="small text-muted mb-3">How was your exchange experience with <strong>{{ req.owner.full_name }}</strong>?</p>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-muted">Rating (1 to 5 Stars)</label>
+                                                <select name="rating" class="form-select" required>
+                                                    <option value="5">⭐⭐⭐⭐⭐ 5 Stars - Book in perfect condition</option>
+                                                    <option value="4">⭐⭐⭐⭐ 4 Stars - Very Good</option>
+                                                    <option value="3">⭐⭐⭐ 3 Stars - Average</option>
+                                                    <option value="2">⭐⭐ 2 Stars - Below expectations</option>
+                                                    <option value="1">⭐ 1 Star - Poor experience</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-muted">Feedback / Comments (Optional)</label>
+                                                <textarea name="comment" class="form-control" rows="2" placeholder="Helpful, quick handover on campus..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-top bg-light-subtle">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-teal btn-sm">Submit Rating</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-send display-4 text-muted mb-3 d-block"></i>
+                        <h5>No outgoing exchange requests</h5>
+                        <p class="text-muted small">Browse the marketplace and submit requests for textbooks you need.</p>
+                        <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-custom btn-sm">Explore Marketplace</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

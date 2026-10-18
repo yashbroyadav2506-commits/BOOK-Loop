@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary-navy mb-0">Moderation Audit Logs</h1>
+            <p class="text-muted small mb-0">Immutable record of all administrative actions taken on Pallotti BookLoop</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        {% if logs %}
+        <div class="table-responsive">
+            <table class="table align-middle table-hover small">
+                <thead class="table-light text-muted">
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Administrator</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in logs %}
+                    <tr>
+                        <td class="text-muted font-monospace">{{ l.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="fw-bold">{{ l.admin_name }}</td>
+                        <td><span class="badge bg-secondary font-monospace">{{ l.action }}</span></td>
+                        <td>{{ l.target_type }} #{{ l.target_id or 'N/A' }}</td>
+                        <td>{{ l.details }}</td>
+                        <td class="text-muted font-monospace">{{ l.ip_address }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            No audit logs recorded yet.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

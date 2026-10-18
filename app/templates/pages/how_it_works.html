@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <span class="badge bg-teal-subtle text-teal px-3 py-1 rounded-pill mb-2">Step-by-Step Guide</span>
+        <h1 class="fw-bold text-primary-navy">How Pallotti BookLoop Works</h1>
+        <p class="text-muted">A clear, transparent guide to listing, requesting, and exchanging academic books safely on campus.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-8">
+            <!-- Step 1 -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="stat-icon stat-icon-navy rounded-circle" style="width: 50px; height: 50px;">
+                        <span class="fw-bold fs-4">1</span>
+                    </span>
+                    <h4 class="fw-bold text-primary-navy mb-0">Create & Verify Your Student Account</h4>
+                </div>
+                <p class="text-secondary leading-relaxed mb-0">
+                    Register with your name, college email, department, and academic year. Click the secure verification link sent to your inbox to unlock book listing and request privileges.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="stat-icon stat-icon-teal rounded-circle" style="width: 50px; height: 50px;">
+                        <span class="fw-bold fs-4">2</span>
+                    </span>
+                    <h4 class="fw-bold text-primary-navy mb-0">List Books You've Completed</h4>
+                </div>
+                <p class="text-secondary leading-relaxed mb-0">
+                    Use the <strong>List a Book</strong> form to input your textbook's title, condition, and course semester. Enter an ISBN to autofill book details and cover images from Open Library in seconds, or upload a photo directly.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="stat-icon stat-icon-green rounded-circle" style="width: 50px; height: 50px;">
+                        <span class="fw-bold fs-4">3</span>
+                    </span>
+                    <h4 class="fw-bold text-primary-navy mb-0">Discover & Submit Exchange Requests</h4>
+                </div>
+                <p class="text-secondary leading-relaxed mb-0">
+                    Browse the <strong>Marketplace</strong> by department or semester. When you find a book you need, click <em>Request Exchange</em>. You can attach a personal message and optionally offer one of your own books in return.
+                </p>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="stat-icon stat-icon-amber rounded-circle" style="width: 50px; height: 50px;">
+                        <span class="fw-bold fs-4">4</span>
+                    </span>
+                    <h4 class="fw-bold text-primary-navy mb-0">Meet on Campus & Complete the Handover</h4>
+                </div>
+                <p class="text-secondary leading-relaxed mb-0">
+                    When the book owner accepts your request, the book is automatically marked <em>Reserved</em>, preventing conflicts. Contact details and preferred campus meeting spots (e.g. Central Library) are unlocked for both students. Meet up, hand over the book, and mark the exchange <strong>Completed</strong>!
+                </p>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ url_for('books.marketplace') }}" class="btn btn-teal px-4 py-2 me-2">Explore Marketplace</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-custom px-4 py-2">Join BookLoop Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

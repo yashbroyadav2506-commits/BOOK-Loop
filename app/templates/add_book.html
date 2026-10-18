@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                <div class="text-center mb-4">
+                    <span class="badge bg-teal-subtle text-teal p-2 rounded-circle mb-2">
+                        <i class="bi bi-journal-plus fs-3"></i>
+                    </span>
+                    <h2 class="fw-bold text-primary-navy">
+                        {% if is_edit %}Edit Book Listing{% else %}List a Book for Exchange{% endif %}
+                    </h2>
+                    <p class="text-muted small">
+                        {% if is_edit %}Update your textbook information and condition.{% else %}Share an academic textbook with fellow SVPCET students.{% endif %}
+                    </p>
+                </div>
+
+                <!-- ISBN Helper Callout -->
+                {% if not is_edit %}
+                <div class="p-3 mb-4 rounded-3 bg-light border border-info-subtle">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="fw-bold small text-primary-navy">
+                            <i class="bi bi-magic text-teal me-1"></i> Quick ISBN Autofill (Optional)
+                        </span>
+                        <span class="badge bg-secondary-subtle text-muted">Powered by Open Library</span>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="isbn-helper" class="form-control form-control-sm" placeholder="Enter ISBN-10 or ISBN-13 (e.g. 9780262033848)" oninput="document.getElementById('isbn').value = this.value;">
+                        <button class="btn btn-outline-teal btn-sm" type="button" id="btn-lookup-isbn">
+                            <i class="bi bi-search me-1"></i> Autofill Details
+                        </button>
+                    </div>
+                    <div id="isbn-lookup-status" class="d-none"></div>
+                </div>
+                {% endif %}
+
+                <!-- Form -->
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-bold small text-muted">Book Title <span class="text-danger">*</span></label>
+                        {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="e.g. Higher Engineering Mathematics", id="title") }}
+                        {% for error in form.title.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Author -->
+                    <div class="mb-3">
+                        <label for="author" class="form-label fw-bold small text-muted">Author(s) <span class="text-danger">*</span></label>
+                        {{ form.author(class="form-control" + (" is-invalid" if form.author.errors else ""), placeholder="e.g. Dr. B.S. Grewal", id="author") }}
+                        {% for error in form.author.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <!-- Category -->
+                        <div class="col-md-4">
+                            <label for="category" class="form-label small fw-bold text-muted">Academic Stream <span class="text-danger">*</span></label>
+                            {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else ""), id="category") }}
+                            {% for error in form.category.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Semester -->
+                        <div class="col-md-4">
+                            <label for="semester" class="form-label small fw-bold text-muted">Engineering Semester</label>
+                            {{ form.semester(class="form-select", id="semester") }}
+                        </div>
+
+                        <!-- Condition -->
+                        <div class="col-md-4">
+                            <label for="condition" class="form-label small fw-bold text-muted">Condition <span class="text-danger">*</span></label>
+                            {{ form.condition(class="form-select" + (" is-invalid" if form.condition.errors else ""), id="condition") }}
+                            {% for error in form.condition.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- ISBN -->
+                    <div class="mb-3">
+                        <label for="isbn" class="form-label fw-bold small text-muted">ISBN (Optional)</label>
+                        {{ form.isbn(class="form-control" + (" is-invalid" if form.isbn.errors else ""), placeholder="10 or 13 digit ISBN", id="isbn") }}
+                        {% for error in form.isbn.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-bold small text-muted">Description & Edition Notes (Optional)</label>
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3, placeholder="Mention edition, course code, semester usefulness, or any highlighting...", id="description") }}
+                        {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Image Options: File Upload or Direct URL -->
+                    <div class="card border rounded-3 p-3 bg-light-subtle mb-4">
+                        <label class="form-label fw-bold small text-primary-navy mb-2">Book Cover Image</label>
+                        
+                        <div class="mb-3">
+                            <label for="cover_image_file" class="form-label small text-muted">Upload Photo (JPG, PNG, WebP &bull; Max 2MB)</label>
+                            {{ form.cover_image_file(class="form-control", id="cover_image_file") }}
+                            <div class="form-text small">Uploaded directly to cloud object storage.</div>
+                        </div>
+
+                        <div class="text-center small text-muted my-1">&mdash; OR &mdash;</div>
+
+                        <div class="mb-2">
+                            <label for="cover_image_url" class="form-label small text-muted">Direct Image Link (HTTP/HTTPS URL)</label>
+                            {{ form.cover_image_url(class="form-control" + (" is-invalid" if form.cover_image_url.errors else ""), placeholder="https://example.com/cover.jpg", id="cover_image_url") }}
+                            {% for error in form.cover_image_url.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Live image preview -->
+                        <div class="mt-2 text-center">
+                            <img id="cover-preview-img" src="{{ form.cover_image_url.data or '' }}" alt="Cover Preview" class="img-thumbnail {% if not form.cover_image_url.data %}d-none{% endif %}" style="max-height: 150px;">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{{ url_for('books.marketplace') }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-teal px-4">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if is_edit %}Save Changes{% else %}Publish Book Listing{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

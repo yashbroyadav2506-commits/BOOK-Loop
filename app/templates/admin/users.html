@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary-navy mb-0">Student User Management</h1>
+            <p class="text-muted small mb-0">Manage student accounts, verify statuses, and assign administrator roles</p>
+        </div>
+        <form action="{{ url_for('admin.users') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by name, email..." value="{{ search }}">
+            <button class="btn btn-outline-custom btn-sm" type="submit">Search</button>
+            {% if search %}
+            <a href="{{ url_for('admin.users') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+        {% if users %}
+        <div class="table-responsive">
+            <table class="table align-middle table-hover">
+                <thead class="table-light small text-muted">
+                    <tr>
+                        <th>Student Name & Email</th>
+                        <th>Department</th>
+                        <th>Academic Year</th>
+                        <th>Verified</th>
+                        <th>Admin</th>
+                        <th>Account Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-primary-navy">
+                                <a href="{{ url_for('books.student_profile', user_id=u.id) }}" class="text-decoration-none text-primary-navy">
+                                    {{ u.full_name }}
+                                </a>
+                            </div>
+                            <div class="small text-muted">{{ u.college_email }}</div>
+                        </td>
+                        <td class="small">{{ u.department }}</td>
+                        <td class="small">{{ u.academic_year }}</td>
+                        <td>
+                            {% if u.is_verified %}
+                                <span class="badge bg-success-subtle text-success"><i class="bi bi-patch-check-fill me-1"></i>Verified</span>
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning"><i class="bi bi-clock me-1"></i>Unverified</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_admin %}
+                                <span class="badge bg-primary">Admin</span>
+                            {% else %}
+                                <span class="text-muted small">Student</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Deactivated</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if u.id != current_user.id %}
+                            <div class="btn-group btn-group-sm">
+                                <form action="{{ url_for('admin.toggle_user_active', user_id=u.id) }}" method="POST" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="Toggle Active">
+                                        {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('admin.toggle_user_admin', user_id=u.id) }}" method="POST" class="d-inline ms-1">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Toggle Admin">
+                                        {% if u.is_admin %}Demote{% else %}Make Admin{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="badge bg-light text-muted border">Current User</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            No students found matching "{{ search }}".
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
